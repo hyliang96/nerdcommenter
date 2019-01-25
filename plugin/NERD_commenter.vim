@@ -1094,7 +1094,6 @@ function s:CommentLinesToggle(forceNested, firstLine, lastLine)
         call setline(currentLine, theLine)
         let currentLine = currentLine + 1
     endwhile
-
 endfunction
 
 " Function: s:CommentRegion(topline, topCol, bottomLine, bottomCol) function {{{2
@@ -1272,11 +1271,11 @@ function! NERDComment(mode, type) range
           for i in range(firstLine, lastLine)
             let theLine = getline(i)
             " if have one line no comment, then comment all lines
-            if !s:IsInSexyComment(firstLine) && !s:IsCommentedFromStartOfLine(s:Left(), theLine) && !s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine)
+            if !s:IsInSexyComment(firstLine) && !s:IsCommentedFromStartOfLine(s:Left(), theLine) && !s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine) && !( theLine =~ "^[ \t]*$" )
               let l:commentAllLines = 1
               break
             else
-          endif
+            endif
           endfor
           if l:commentAllLines ==# 1
             call s:CommentLinesToggle(forceNested, firstLine, lastLine)
