@@ -172,7 +172,7 @@ let s:delimiterMap = {
     \ 'exports': { 'left': '#' },
     \ 'factor': { 'left': '! ', 'leftAlt': '!# ' },
     \ 'fancy': { 'left': '#' },
-    \ 'faust': { 'left': '//' }, 
+    \ 'faust': { 'left': '//' },
     \ 'fgl': { 'left': '#' },
     \ 'focexec': { 'left': '-*' },
     \ 'form': { 'left': '*' },
@@ -1259,29 +1259,36 @@ function! NERDComment(mode, type) range
         endtry
 
     elseif a:type ==? 'Toggle'
-        if g:NERDToggleCheckAllLines ==# 0
-          let theLine = getline(firstLine)
-          if s:IsInSexyComment(firstLine) || s:IsCommentedFromStartOfLine(s:Left(), theLine) || s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine)
-              call s:UncommentLines(firstLine, lastLine)
-          else
-              call s:CommentLinesToggle(forceNested, firstLine, lastLine)
-          endif
-        else
-          let l:commentAllLines = 0
-          for i in range(firstLine, lastLine)
-            let theLine = getline(i)
-            " if have one line no comment, then comment all lines
-            if !s:IsInSexyComment(firstLine) && !s:IsCommentedFromStartOfLine(s:Left(), theLine) && !s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine) && !( theLine =~ "^[ \t]*$" )
-              let l:commentAllLines = 1
-              break
-            else
-            endif
-          endfor
-          if l:commentAllLines ==# 1
+        let theLine = getline(firstLine)
+        if ( firstLine ==# lastLine ) && ( theLine =~ "^[ \t]*$" )
+
+            let tmp = g:NERDCommentEmptyLines
+            let g:NERDCommentEmptyLines = 1
             call s:CommentLinesToggle(forceNested, firstLine, lastLine)
-          else
-            call s:UncommentLines(firstLine, lastLine)
-          endif
+            let g:NERDCommentEmptyLines = tmp
+        elseif g:NERDToggleCheckAllLines ==# 0
+            let theLine = getline(firstLine)
+            if s:IsInSexyComment(firstLine) || s:IsCommentedFromStartOfLine(s:Left(), theLine) || s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine)
+                call s:UncommentLines(firstLine, lastLine)
+            else
+                call s:CommentLinesToggle(forceNested, firstLine, lastLine)
+            endif
+        else
+            let l:commentAllLines = 0
+            for i in range(firstLine, lastLine)
+                let theLine = getline(i)
+                " if have one line no comment, then comment all lines
+                if !s:IsInSexyComment(firstLine) && !s:IsCommentedFromStartOfLine(s:Left(), theLine) && !s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine) && !( theLine =~ "^[ \t]*$" )
+                    let l:commentAllLines = 1
+                    break
+                else
+                endif
+            endfor
+            if l:commentAllLines ==# 1
+                call s:CommentLinesToggle(forceNested, firstLine, lastLine)
+            else
+                call s:UncommentLines(firstLine, lastLine)
+            endif
         endif
 
     elseif a:type ==? 'Minimal'
